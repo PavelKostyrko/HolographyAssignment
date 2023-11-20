@@ -1,0 +1,576 @@
+﻿<Window x:Class="FootballManager.Views.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:FootballManager.Views.Windows"
+        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
+        xmlns:viewmodels="clr-namespace:FootballManager.ViewModels"
+        d:DataContext="{d:DesignInstance Type=viewmodels:MainWindowViewModel}"
+        mc:Ignorable="d"
+        Title="Football Manager"
+        MinHeight="800" MinWidth="1200"
+        Background="#4373c8"
+        ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen">
+    <Window.Resources>
+        <Style TargetType="{x:Type GridViewColumnHeader}">
+            <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        </Style>
+    </Window.Resources>
+    <TabControl
+        Margin="10 20 10 40"
+        BorderThickness="0"
+        HorizontalAlignment="Center">
+        <TabItem
+            x:Name="playerTab"
+            Background="Transparent"
+            BorderBrush="Transparent">
+            <TabItem.Header>
+                <TextBlock
+                    Text="Игрок"
+                    FontSize="32"
+                    Padding="75 10 75 10"
+                    FontWeight="DemiBold"/>
+            </TabItem.Header>
+            <TabItem.Content>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <DockPanel LastChildFill="False">
+                        <Button x:Name="buttonPlayerSave"
+                                Command="{Binding SavePlayerTab}"
+                                IsEnabled="{Binding Path=SaveButtonPlayerTab.IsEnabled}"
+                                Content="Сохранить"
+                                Height="30"
+                                HorizontalAlignment="Stretch"
+                                FontSize="16" Foreground="White"
+                                Margin="5 5 5 5"
+                                Background="#4373c8"
+                                DockPanel.Dock="Bottom"/>
+                        <Button x:Name="buttonPlayerCreate"
+                                Command="{Binding ShowPLayerTabCreatingBox}"
+                                Content="+Создать"
+                                Height="30"
+                                HorizontalAlignment="Stretch"
+                                FontSize="16"
+                                Foreground="White"
+                                Margin="5 5 5 5"
+                                Background="#4373c8"
+                                DockPanel.Dock="Bottom"/>
+                        <GroupBox x:Name="boxForPlayerCreating"
+                                FontSize="24"
+                                Visibility="{Binding Path=CreatingBoxPlayerTab.Visibility}"
+                                DockPanel.Dock="Bottom"
+                                HorizontalAlignment="Stretch"
+                                Margin="5 5 5 5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="40"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Text="Введите имя"
+                                    Grid.Row="0" Grid.Column="0"
+                                    HorizontalAlignment="Center"/>
+                                <TextBox
+                                    Text="{Binding PlayerForCreating.Name, Mode=TwoWay, ValidatesOnDataErrors=True}"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0 0 5 0"/>
+                                <TextBlock
+                                    Text="Введите фамилию" 
+                                    Grid.Row="0" Grid.Column="1" 
+                                    HorizontalAlignment="Center"/>
+                                <TextBox
+                                    Text="{Binding PlayerForCreating.Surname, Mode=TwoWay}"
+                                    Grid.Row="1"
+                                    Grid.Column="1" 
+                                    Margin="0 0 5 0"/>
+                                <TextBlock
+                                    Text="Введите дату рождения"
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Center"/>
+                                <DatePicker
+                                    Text="{Binding PlayerForCreating.BirthDate, Mode=TwoWay}"
+                                    DisplayDateStart="09.05.1945"
+                                    Focusable = "False"
+                                    SelectedDateFormat="Short"
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Margin="0 0 5 0"/>
+                                <TextBlock
+                                    Text="Выберите амплуа"
+                                    Grid.Row="0"
+                                    Grid.Column="3"
+                                    HorizontalAlignment="Center"/>
+                                <ComboBox
+                                    Text="{Binding PlayerForCreating.Role, Mode=TwoWay}"
+                                    Grid.Row="1"
+                                    Grid.Column="3"
+                                    Margin="0 0 5 0">
+                                    <sys:String>Нападающий</sys:String>
+                                    <sys:String>Полузащитник</sys:String>
+                                    <sys:String>Защитник</sys:String>
+                                    <sys:String>Вратарь</sys:String>
+                                </ComboBox>
+                            </Grid>
+                        </GroupBox>
+                        <ListView
+                            x:Name="playersList"
+                            ItemsSource="{Binding AllPlayers}"
+                            FontSize="24"
+                            DockPanel.Dock="Top"
+                            Margin="20 15 20 15"
+                            HorizontalAlignment="Stretch"
+                            BorderThickness="0">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Name}"
+                                        Header="Имя"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Surname}"
+                                        Header="Фамилия"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=BirthDate, StringFormat='{}{0:dd.MM.yyyy}'}"
+                                        Header="Год рождения"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Role}"
+                                        Header="Амплуа"/>
+                                    <GridViewColumn
+                                        Header="Удаление игрока">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Content="Удалить"
+                                                    IsEnabled="{Binding Path=CanDelete}"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor,
+                                                        AncestorType={x:Type ListView}},Path=DataContext.DeletePlayer}"
+                                                    CommandParameter="{Binding RelativeSource={RelativeSource Self},
+                                                        Path=DataContext}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </ScrollViewer>
+            </TabItem.Content>
+        </TabItem>
+
+        <TabItem
+            x:Name="teamTab"
+            Background="Transparent"
+            BorderBrush="Transparent">
+            <TabItem.Header>
+                <TextBlock
+                    Text="Команда"
+                    FontSize="32"
+                    Padding="75 10 75 10"
+                    FontWeight="DemiBold"/>
+            </TabItem.Header>
+            <TabItem.Content>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <DockPanel LastChildFill="False">
+                        <Button
+                            x:Name="buttonTeamSave"
+                            Command="{Binding SaveTeamTab}"
+                            IsEnabled="{Binding Path=SaveButtonTeamTab.IsEnabled}"
+                            Content="Сохранить"
+                            Height="30"
+                            HorizontalAlignment="Stretch"
+                            FontSize="16"
+                            Foreground="White"
+                            Margin="5 5 5 5"
+                            Background="#4373c8"
+                            DockPanel.Dock="Bottom"/>
+                        <Button x:Name="buttonTeamCreate"
+                                Command="{Binding ShowTeamTabCreatingBox}"
+                                Content="+Создать"
+                                Height="30"
+                                HorizontalAlignment="Stretch"
+                                FontSize="16"
+                                Foreground="White"
+                                Margin="5 5 5 5"
+                                Background="#4373c8"
+                                DockPanel.Dock="Bottom"/>
+                        <GroupBox
+                            Name="boxForTeamCreating"
+                            FontSize="24" Visibility="{Binding Path=CreatingBoxTeamTab.Visibility}"
+                            DockPanel.Dock="Bottom"
+                            HorizontalAlignment="Stretch"
+                            Margin="5 5 5 5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="40"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Text="Введите название"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"/>
+                                <TextBox
+                                    Text="{Binding TeamForCreating.Title, Mode=TwoWay}"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0 0 5 0"/>
+                                <TextBlock
+                                    Text="Введите город"
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"/>
+                                <TextBox
+                                    Text="{Binding TeamForCreating.City, Mode=TwoWay}"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="0 0 5 0"/>
+                                <TextBlock
+                                    Text="Введите страну"
+                                    Grid.Row="0" Grid.Column="2"
+                                    HorizontalAlignment="Center"/>
+                                <TextBox
+                                    Text="{Binding TeamForCreating.Country, Mode=TwoWay}"
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Margin="0 0 5 0"/>
+                            </Grid>
+                        </GroupBox>
+                        <ListView
+                            x:Name="teamsList"
+                            ItemsSource="{Binding AllTeams}"
+                            FontSize="24"
+                            DockPanel.Dock="Top"
+                            Margin="20 15 20 15"
+                            HorizontalAlignment="Stretch"
+                            BorderThickness="0">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Title}"
+                                        Header="Наименование"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=City}"
+                                        Header="Город"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Country}"
+                                        Header="Страна"/>
+                                    <GridViewColumn
+                                        Header="Удаление игрока">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Content="Удалить"
+                                                    IsEnabled="{Binding Path=CanDelete}"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor,
+                                                        AncestorType={x:Type ListView}},Path=DataContext.DeleteTeam}"
+                                                    CommandParameter="{Binding RelativeSource={RelativeSource Self},
+                                                        Path=DataContext}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </ScrollViewer>
+            </TabItem.Content>
+        </TabItem>
+
+        <TabItem
+            x:Name="compositionTab"
+            Background="Transparent"
+            BorderBrush="Transparent">
+            <TabItem.Header>
+                <TextBlock
+                    Text="Состав"
+                    FontSize="32"
+                    Padding="75 10 75 10"
+                    FontWeight="DemiBold"/>
+            </TabItem.Header>
+            <TabItem.Content>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <DockPanel LastChildFill="False">
+                        <Button
+                            x:Name="buttonСompositionSave"
+                            Command="{Binding SaveCompositionTab}"
+                            IsEnabled="{Binding Path=SaveButtonCompositionTab.IsEnabled}"
+                            Content="Сохранить"
+                            Height="30"
+                            HorizontalAlignment="Stretch"
+                            FontSize="16"
+                            Foreground="White"
+                            Margin="5 5 5 5"
+                            Background="#4373c8"
+                            DockPanel.Dock="Bottom"/>
+                        <Button
+                            x:Name="buttonTransferPlayer"
+                            Command="{Binding ShowCompositionTabPlayerForTransferSelectionBox}"
+                            Content="+Оформить трансфер игрока"
+                            Height="30"
+                            HorizontalAlignment="Stretch"
+                            FontSize="16"
+                            Foreground="White"
+                            Margin="5 5 5 5"
+                            Background="#4373c8"
+                            DockPanel.Dock="Bottom"/>
+                        <Button
+                            x:Name="buttonAddFreePlayer"
+                            Command="{Binding ShowCompositionTabFreeAgentSelectionBox}"
+                            Content="+Свободного агента (игрока)"
+                            Height="30"
+                            HorizontalAlignment="Stretch"
+                            FontSize="16"
+                            Foreground="White"
+                            Margin="5 5 5 5"
+                            Background="#4373c8"
+                            DockPanel.Dock="Bottom"/>
+                        <GroupBox 
+                            x:Name="boxForChangePlayerContract"
+                            FontSize="24"
+                            Visibility="{Binding Path=CreatingBoxCompositionTab.Visibility}"
+                            DockPanel.Dock="Bottom"
+                            HorizontalAlignment="Stretch"
+                            Margin="5 5 5 5">
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition/>
+                                    <RowDefinition Height="40"/>
+                                </Grid.RowDefinitions>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                    <ColumnDefinition/>
+                                </Grid.ColumnDefinitions>
+                                <TextBlock
+                                    Text="Свободный игрок"
+                                    Grid.Row="0"
+                                    Grid.Column="0"
+                                    HorizontalAlignment="Center"/>
+                                <ComboBox
+                                    ItemsSource="{Binding FreeAgents}"
+                                    SelectedItem="{Binding SelectedFreeAgent}"
+                                    IsEnabled="{Binding Path=FreeAgentSelectionBox.IsEnabled}"
+                                    Grid.Row="1"
+                                    Grid.Column="0"
+                                    Margin="0 0 5 0">
+                                    <ComboBox.ItemTemplate >
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{} {0} {1}">
+                                                        <Binding Path="Name"/>
+                                                        <Binding Path="Surname"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBlock
+                                    Text="В команду"
+                                    Grid.Row="0"
+                                    Grid.Column="1"
+                                    HorizontalAlignment="Center"/>
+                                <ComboBox
+                                    ItemsSource="{Binding TeamsForTransfer}"
+                                    SelectedItem="{Binding SelectedTeamForTransfer}"
+                                    Grid.Row="1"
+                                    Grid.Column="1"
+                                    Margin="0 0 5 0">
+                                    <ComboBox.ItemTemplate >
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{} {0} {1}">
+                                                        <Binding Path="Title"/>
+                                                        <Binding Path="City"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                                <TextBlock
+                                    Text="Номер игрока"
+                                    Grid.Row="0"
+                                    Grid.Column="2"
+                                    HorizontalAlignment="Center"/>
+                                <TextBox
+                                    Grid.Row="1"
+                                    Grid.Column="2"
+                                    Text="{Binding NumberForPlayer}">
+                                </TextBox>
+                                <TextBlock
+                                    Text="Игрок для трансфера"
+                                    Grid.Row="0"
+                                    Grid.Column="3"
+                                    HorizontalAlignment="Center"/>
+                                <ComboBox
+                                    ItemsSource="{Binding PlayersForTransfer}"
+                                    SelectedItem="{Binding SelectedPlayerForTransfer}"
+                                    IsEnabled="{Binding Path=PlayerForTransferSelectionBox.IsEnabled}"
+                                    Grid.Row="1"
+                                    Grid.Column="3"
+                                    Margin="0 0 5 0">
+                                    <ComboBox.ItemTemplate >
+                                        <DataTemplate>
+                                            <TextBlock>
+                                                <TextBlock.Text>
+                                                    <MultiBinding StringFormat="{} {0} {1}">
+                                                        <Binding Path="Name"/>
+                                                        <Binding Path="Surname"/>
+                                                    </MultiBinding>
+                                                </TextBlock.Text>
+                                            </TextBlock>
+                                        </DataTemplate>
+                                    </ComboBox.ItemTemplate>
+                                </ComboBox>
+                            </Grid>
+                        </GroupBox>
+                        <ListView
+                            x:Name="clubsForComposition"
+                            ItemsSource="{Binding AllTeams}"
+                            SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor,
+                                AncestorType={x:Type ListView}}, Path=SelectedItem}"
+                            FontSize="24" 
+                            Margin="20 15 0 15"
+                            DockPanel.Dock="Left"
+                            VerticalAlignment="Top"
+                            Background="#fdc101">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Title}"
+                                        Header="Клубы"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <ListView 
+                            x:Name="teamComposition"
+                            ItemsSource="{Binding ElementName=clubsForComposition, Path=SelectedItem.Players}"
+                            FontSize="24"
+                            DockPanel.Dock="Top"
+                            Margin="20 15 20 15"
+                            HorizontalAlignment="Stretch"
+                            BorderThickness="0">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Name}"
+                                        Header="Имя"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Surname}"
+                                        Header="Фамилия"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=Number}"
+                                        Header="Номер"/>
+                                    <GridViewColumn
+                                        Header="Удалить из состава">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <Button
+                                                    Content="Удалить"
+                                                    Command="{Binding RelativeSource={RelativeSource FindAncestor,
+                                                        AncestorType={x:Type ListView}},Path=DataContext.DeletePlayerFromTeam}"
+                                                    CommandParameter="{Binding RelativeSource={RelativeSource Self},
+                                                        Path=DataContext}"/>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </ScrollViewer>
+            </TabItem.Content>
+        </TabItem>
+
+        <TabItem
+            x:Name="biographyTab"
+            Background="Transparent"
+            BorderBrush="Transparent">
+            <TabItem.Header>
+                <TextBlock
+                    Text="Биография"
+                    FontSize="32"
+                    Padding="75 10 75 10"
+                    FontWeight="DemiBold"/>
+            </TabItem.Header>
+            <TabItem.Content>
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <DockPanel LastChildFill="False">
+                        <ListView
+                            x:Name="playersForBiography"
+                            ItemsSource="{Binding AllPlayers}"
+                            SelectedItem="{Binding RelativeSource={RelativeSource FindAncestor,
+                                AncestorType={x:Type ListView}}, Path=SelectedItem}"
+                            FontSize="24"
+                            Margin="20 15 0 15"
+                            Background="#fdc101"
+                            DockPanel.Dock="Left"
+                            VerticalAlignment="Top">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn Header="Игроки">
+                                        <GridViewColumn.CellTemplate>
+                                            <DataTemplate>
+                                                <TextBlock>
+                                                    <TextBlock.Text>
+                                                        <MultiBinding StringFormat="{} {0} {1}">
+                                                            <Binding Path="Name"/>
+                                                            <Binding Path="Surname"/>
+                                                        </MultiBinding>
+                                                    </TextBlock.Text>
+                                                </TextBlock>
+                                            </DataTemplate>
+                                        </GridViewColumn.CellTemplate>
+                                    </GridViewColumn>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                        <ListView
+                            x:Name="playerBiography"
+                            ItemsSource="{Binding ElementName=playersForBiography, 
+                                Path=SelectedItem.BiographicalEpisodies}"
+                            FontSize="24"
+                            DockPanel.Dock="Top"
+                            Margin="20 15 20 15"
+                            HorizontalAlignment="Stretch"
+                            BorderThickness="0">
+                            <ListView.View>
+                                <GridView>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=TeamTitle}"
+                                        Header="Клубы"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=StartContract}"
+                                        Header="Начало Контракта"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=EndContract}"
+                                        Header="Конец Контракта"/>
+                                    <GridViewColumn
+                                        DisplayMemberBinding="{Binding Path=ContractStatus}"
+                                        Header="Статус Контракта"/>
+                                </GridView>
+                            </ListView.View>
+                        </ListView>
+                    </DockPanel>
+                </ScrollViewer>
+            </TabItem.Content>
+        </TabItem>
+    </TabControl>
+</Window>
